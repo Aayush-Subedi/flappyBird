@@ -1,76 +1,79 @@
-import "./App.css";
-import styled from "styled-components";
-import { useEffect, useState } from "react";
+import "./App.css"; // imports the App.css file
+import styled from "styled-components"; // imports the styled-components library
+import { useEffect, useState } from "react"; // imports the useEffect and useState hooks from the react library
 
-const BIRD_SIZE = 20;
-const GAME_WIDTH = 500;
-const GAME_HEIGHT = 500;
-const GRAVITY = 6;
-const JUMP_HEIGHT = 100;
-const OBSTACLE_WIDTH = 40;
-const OBSTACLE_GAP = 200;
+const BIRD_SIZE = 20; // sets the size of the bird
+const GAME_WIDTH = 500; // sets the width of the game
+const GAME_HEIGHT = 500; // sets the height of the game
+const GRAVITY = 6; // sets the gravity for the bird
+const JUMP_HEIGHT = 100; // sets the jump height for the bird
+const OBSTACLE_WIDTH = 40; // sets the width of the obstacles
+const OBSTACLE_GAP = 200; // sets the gap between the top and bottom obstacles
 
 function App() {
-  const [birdPosition, setBirdPosition] = useState(250);
-  const [gameHasStarted, setGameHasStarted] = useState(false);
-  const [obstacleHeight, setObstacleHeight] = useState(200);
-  const [obstacleLeft, setObstacleLeft] = useState(GAME_WIDTH - OBSTACLE_WIDTH);
-  const [score, setScore] = useState(0);
+  const [birdPosition, setBirdPosition] = useState(250); // sets the initial position of the bird
+  const [gameHasStarted, setGameHasStarted] = useState(false); // sets the initial state of the game
+  const [obstacleHeight, setObstacleHeight] = useState(200); // sets the initial height of the obstacles
+  const [obstacleLeft, setObstacleLeft] = useState(GAME_WIDTH - OBSTACLE_WIDTH); // sets the initial position of the obstacles
+  const [score, setScore] = useState(0); // sets the initial score to 0
 
-  const bottomObstacleHeight = GAME_HEIGHT - OBSTACLE_GAP - obstacleHeight;
+  const bottomObstacleHeight = GAME_HEIGHT - OBSTACLE_GAP - obstacleHeight; // calculates the height of the bottom obstacle
 
   useEffect(() => {
     let timeId;
     if (gameHasStarted && birdPosition < GAME_HEIGHT - BIRD_SIZE)
+      // if the game has started and the bird is still within the game height
       timeId = setInterval(() => {
-        setBirdPosition((birdPosition) => birdPosition + GRAVITY);
+        setBirdPosition((birdPosition) => birdPosition + GRAVITY); // updates the bird's position based on gravity
       }, 24);
 
     return () => {
-      clearInterval(timeId);
+      clearInterval(timeId); // clears the interval when the component is unmounted
     };
   }, [birdPosition, gameHasStarted]);
 
   useEffect(() => {
     let obstacleId;
     if (gameHasStarted && obstacleLeft >= -OBSTACLE_WIDTH) {
+      // if the game has started and the obstacle is still within the game width
       obstacleId = setInterval(() => {
-        setObstacleLeft((obstacleLeft) => obstacleLeft - 5);
+        setObstacleLeft((obstacleLeft) => obstacleLeft - 5); // moves the obstacle to the left by 5px
       }, 24);
 
       return () => {
-        clearInterval(obstacleId);
+        clearInterval(obstacleId); // clears the interval when the component is unmounted
       };
     } else {
-      setObstacleLeft(GAME_WIDTH - OBSTACLE_WIDTH);
+      setObstacleLeft(GAME_WIDTH - OBSTACLE_WIDTH); // resets the obstacle's position
       setObstacleHeight(
-        Math.floor(Math.random() * (GAME_HEIGHT - OBSTACLE_GAP))
+        Math.floor(Math.random() * (GAME_HEIGHT - OBSTACLE_GAP)) // generates a random height for the obstacle
       );
-      setScore(score => score + 1);
+      setScore((score) => score + 1); // increments the score
     }
   }, [gameHasStarted, obstacleLeft]);
 
   useEffect(() => {
     const hasCollidedWithTopObstacle =
-      birdPosition >= 0 && birdPosition < obstacleHeight;
+      birdPosition >= 0 && birdPosition < obstacleHeight; // checks if the bird has collided with the top obstacle
     const hasCollidedWithBottomObstacle =
-      birdPosition <= 500 && birdPosition >= 500 - bottomObstacleHeight;
+      birdPosition <= 500 && birdPosition >= 500 - bottomObstacleHeight; // checks if the bird has collided with the bottom obstacle
     if (
       obstacleLeft >= 0 &&
       obstacleLeft <= OBSTACLE_WIDTH &&
       (hasCollidedWithTopObstacle || hasCollidedWithBottomObstacle)
     ) {
-      setGameHasStarted(false);
+      setGameHasStarted(false); // ends the game if the bird has collided with an obstacle
     }
   }, [birdPosition, obstacleHeight, bottomObstacleHeight, obstacleLeft]);
 
   const handleClick = () => {
-    let newBirdPosition = birdPosition - JUMP_HEIGHT;
+    let newBirdPosition = birdPosition - JUMP_HEIGHT; // calculates the new position of the bird after a jump
     if (!gameHasStarted) {
       setGameHasStarted(true);
       setScore(0);
     }
     if (newBirdPosition < 0) {
+      // prevents the bird from going above the game height
       setBirdPosition(0);
     } else {
       setBirdPosition(newBirdPosition);
@@ -101,6 +104,11 @@ function App() {
 
 export default App;
 
+
+
+
+// styled-components
+
 const Bird = styled.div`
   position: absolute;
   background-color: red;
@@ -114,7 +122,7 @@ const Div = styled.div`
   display: flex;
   width: 100%;
   justify-content: center;
-  & span{
+  & span {
     color: white;
     font-size: 24px;
     position: absolute;
